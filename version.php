@@ -10,7 +10,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 201308040415;
+$plugin->version   = 2013080415;
 $plugin->requires  = 2012110900;
 $plugin->component = 'auth_enrolmentor';
 $plugin->maturity = MATURITY_RC;

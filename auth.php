@@ -217,8 +217,7 @@ class auth_plugin_enrolmentor extends auth_plugin_base {
 		
 		$arraykeys = array_keys($parents);
 		foreach($arraykeys as $arraykey) {			
-			// TODO: Uncomment the line below to enable enrolment.
-			//role_assign($roleid, $parents[$arraykey]->userid, context_user::instance($parents[$arraykey]->userid)->id, 'auth_enrolmentor', 0, '');
+			role_assign($roleid, $parents[$arraykey]->userid, context_user::instance($parents[$arraykey]->userid)->id, 'auth_enrolmentor', 0, '');
 		}		
     }
 }

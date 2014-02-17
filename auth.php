@@ -12,6 +12,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir.'/authlib.php');
 require_once($CFG->dirroot.'/user/profile/lib.php');
+require_once($CFG->dirroot.'/auth/enrolmentor/class/helper.php');
 
 class auth_plugin_enrolmentor extends auth_plugin_base {
 
@@ -196,28 +197,16 @@ class auth_plugin_enrolmentor extends auth_plugin_base {
 		$roleid = $this->config->role;
 			
 		//Get all the user ids that we're a parent of.
-		$profile_field = $this->config->profile_field;
-		
-		switch($this->config->compare) {
-			case 'username':
-				$sql = "SELECT userid FROM mdl_user_info_data
-				WHERE Data = '{$username}'";
-				break;
-			case 'id':
-				$sql = "SELECT userid FROM mdl_user_info_data
-				WHERE Data = '{$user->id}'";
-				break;
-			case 'email':
-				$sql = "SELECT userid FROM mdl_user_info_data
-				WHERE Data = '{$user->email}'";
-				break;
-		}		
-		
-		$parents = $DB->get_records_sql($sql);
-		
-		$arraykeys = array_keys($parents);
-		foreach($arraykeys as $arraykey) {			
-			role_assign($roleid, $user->id, context_user::instance($parents[$arraykey]->userid)->id, 'auth_enrolmentor', 0, '');
-		}		
+		$lista 		= enrolmentor_helper::get_list_employees($user, $username, $this->config);
+		$listb 		= enrolmentor_helper::get_enrolled_employees($roleid, $user->id);
+		$toEnrol 	= array_diff($lista, $listb);
+		$toUnenrol 	= array_diff($listb, $lista);
+
+		if(count($toEnrol) > 0) {
+			enrolmentor_helper::doEnrol($toEnrol, $roleid, $user);
+		}
+		if(count($toUnenrol) > 0) {
+			enrolmentor_helper::doUnenrol($toUnenrol, $roleid, $user);
+		}
     }
 }

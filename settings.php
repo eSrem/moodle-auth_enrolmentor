@@ -13,6 +13,7 @@ defined('MOODLE_INTERNAL') || die;
 global $USER;
 
 require_once($CFG->dirroot.'/user/profile/lib.php');
+require_once($CFG->dirroot.'/auth/enrolmentor/class/helper.php');
 
 if ($ADMIN->fulltree) {
 
@@ -25,24 +26,9 @@ if ($ADMIN->fulltree) {
 		$i++;
 	}
 	$rolenames = array_combine($roleid, $rolename);
+	$profilefields = enrolmentor_helper::get_profile_fields();
 	
-	// NOTICE: This code is in place so that we can easily enable access to default profile fields.
-	// Get all default profile fields that can be filled with information about the users mentor.
-	// $auth = 'enrolmentor';
-	// $authplugin = get_auth_plugin($auth);
-	// $authfields = $authplugin->userfields;
-	// $profilefields = array_combine($authfields, $authfields);	
-	
-	$sql = "SELECT shortname FROM mdl_user_info_field";
-	$customfields_raw = $DB->get_records_sql($sql);
-	$customfields_med = array_keys($customfields_raw);
-	$customfields = array_combine($customfields_med, $customfields_med);
-	
-	//$allfields = array_merge($profilefields, $customfields);
-		
 	$settings->add(new admin_setting_configselect('auth_enrolmentor/role', get_string('enrolmentor_settingrole', 'auth_enrolmentor'), get_string('enrolmentor_settingrolehelp', 'auth_enrolmentor'), '', $rolenames));
 	$settings->add(new admin_setting_configselect('auth_enrolmentor/compare', get_string('enrolmentor_settingcompare', 'auth_enrolmentor'), get_string('enrolmentor_settingcomparehelp', 'auth_enrolmentor'), 'username', array('username'=>'username','email'=>'email','id'=>'id')));
-
-	// Currently the setting below is useless, because in our SQL we select based on Data = XYZ 
-	//$settings->add(new admin_setting_configselect('auth_enrolmentor/profile_field', get_string('enrolmentor_settingprofile_field', 'auth_enrolmentor'), get_string('enrolmentor_settingprofile_fieldhelp', 'auth_enrolmentor'), '', $customfields));
+	$settings->add(new admin_setting_configselect('auth_enrolmentor/profile_field', get_string('enrolmentor_settingprofile_field', 'auth_enrolmentor'), get_string('enrolmentor_settingprofile_fieldhelp', 'auth_enrolmentor'), '', $profilefields));
 }

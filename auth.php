@@ -137,34 +137,6 @@ class auth_plugin_enrolmentor extends auth_plugin_base {
      * $this->config->somefield
      */
     function process_config($config) {
-        // set to defaults if undefined
-
-	if (!isset($config->mainrule_fld)) {
-	    $config->mainrule_fld = '';
-	}
-	if (!isset($config->secondrule_fld)) {
-	    $config->secondrule_fld = 'n/a';
-	}
-	if (!isset($config->replace_arr)) {
-	    $config->replace_arr = '';
-	}
-	if (!isset($config->delim)) {
-	    $config->delim = 'CR+LF';
-	}
-	if (!isset($config->donttouchusers)) {
-	    $config->donttouchusers = '';
-	}
-	if (!isset($config->enableunenrol)) {
-	    $config->enableunenrol = 0;
-	}
-        // save settings
-        set_config('mainrule_fld', $config->mainrule_fld, 'auth_enrolmentor');
-        set_config('secondrule_fld', $config->secondrule_fld, 'auth_enrolmentor');
-        set_config('replace_arr', $config->replace_arr, 'auth_enrolmentor');
-        set_config('delim', $config->delim, 'auth_enrolmentor');
-        set_config('donttouchusers', $config->donttouchusers, 'auth_enrolmentor');
-        set_config('enableunenrol', $config->enableunenrol, 'auth_enrolmentor');
-
         return true;
     }
 
@@ -191,22 +163,27 @@ class auth_plugin_enrolmentor extends auth_plugin_base {
      * @param string $password plain text password (with system magic quotes)
      */
     function user_authenticated_hook(&$user, $username, $password) {
-		global $DB, $SESSION;
+        global $DB, $SESSION;
 
-		//Get the roleid we're going to assign.
-		$roleid = $this->config->role;
-			
-		//Get all the user ids that we're a parent of.
-		$lista 		= enrolmentor_helper::get_list_employees($user, $username, $this->config);
-		$listb 		= enrolmentor_helper::get_enrolled_employees($roleid, $user->id);
-		$toEnrol 	= array_diff($lista, $listb);
-		$toUnenrol 	= array_diff($listb, $lista);
+        //Get the roleid we're going to assign.
+        $roleid = $this->config->role;
+        if($this->config->profile_field != null) {
+            // Get all the user ids that we're a parent of.
+            $lista     = enrolmentor_helper::get_list_employees($user, $username, $this->config);
 
-		if(count($toEnrol) > 0) {
-			enrolmentor_helper::doEnrol($toEnrol, $roleid, $user);
-		}
-		if(count($toUnenrol) > 0) {
-			enrolmentor_helper::doUnenrol($toUnenrol, $roleid, $user);
-		}
+            // Get all the user ids that we're currently a parent of.
+            $listb     = enrolmentor_helper::get_enrolled_employees($roleid, $user->id);
+
+            // Compare the lists
+            $toEnrol   = array_diff($lista, $listb);
+            $toUnenrol = array_diff($listb, $lista);
+
+            if(count($toEnrol) > 0) {
+                enrolmentor_helper::doEnrol($toEnrol, $roleid, $user);
+            }
+            if(count($toUnenrol) > 0) {
+                enrolmentor_helper::doUnenrol($toUnenrol, $roleid, $user);
+            }
+        }
     }
 }

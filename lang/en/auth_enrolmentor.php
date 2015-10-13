@@ -17,3 +17,4 @@ $string['enrolmentor_settingcompare'] = 'Compare these values';
 $string['enrolmentor_settingcomparehelp'] = 'This unique value will be compared against the profile field selected below';
 $string['enrolmentor_settingprofile_field'] = 'You will compare the unique value above against this profile field';
 $string['enrolmentor_settingprofile_fieldhelp'] = 'Select the profile field that says who your mentor is';
+$string['enrolmentor_settingprofile_field_heading'] = 'Please add a custom profile field';
